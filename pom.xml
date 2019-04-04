@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>tech.simter</groupId>
+    <artifactId>simter-parent</artifactId>
+    <version>${revision}</version>
+    <relativePath>../simter-parent</relativePath>
+  </parent>
+  <groupId>tech.simter.reactive</groupId>
+  <artifactId>simter-reactive-test</artifactId>
+  <version>${revision}</version>
+  <packaging>jar</packaging>
+  <name>simter-reactive-test</name>
+  <description>Simter reactive test encapsulation</description>
+  <dependencies>
+    <dependency>
+      <groupId>io.projectreactor</groupId>
+      <artifactId>reactor-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-test-autoconfigure</artifactId>
+    </dependency>
+
+    <!-- jpa -->
+    <dependency>
+      <groupId>javax.persistence</groupId>
+      <artifactId>javax.persistence-api</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>tech.simter.reactive</groupId>
+      <artifactId>simter-reactive-jpa</artifactId>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+  <url>https://github.com/simter/simter-reactive-test</url>
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>https://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://github.com/simter/simter-reactive-test.git</url>
+  </scm>
+  <organization>
+    <name>simter</name>
+    <url>https://github.com/simter</url>
+  </organization>
+  <developers>
+    <developer>
+      <name>RJ.Hwang</name>
+      <email>rongjihuang@gmail.com</email>
+    </developer>
+  </developers>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/simter/simter-reactive-test/issues</url>
+  </issueManagement>
+</project>
