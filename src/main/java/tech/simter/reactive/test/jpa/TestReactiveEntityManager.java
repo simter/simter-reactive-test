@@ -6,8 +6,12 @@ import tech.simter.reactive.jpa.ReactiveJpaWrapper;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A test encapsulation of {@link EntityManager} for reactive world.
@@ -16,7 +20,7 @@ import java.util.List;
  *
  * @author RJ
  */
-public class TestReactiveEntityManager {
+public class TestReactiveEntityManager implements ReactiveEntityManager {
   private final EntityManagerFactory emf;
   private final ReactiveJpaWrapper wrapper;
 
@@ -67,6 +71,84 @@ public class TestReactiveEntityManager {
         for (E entity : entities) merged.add(em.merge(entity));
         em.getTransaction().commit();
         return merged;
+      });
+    }
+  }
+
+  @Override
+  public ReactiveQuery createQuery(String qlString) {
+    return new ReactiveQueryImpl(qlString);
+  }
+
+  @Override
+  public <T> ReactiveTypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
+    return new ReactiveTypedQueryImpl<>(qlString, resultClass);
+  }
+
+  private class ReactiveQueryImpl implements ReactiveQuery {
+    private final Map<String, Object> params = new HashMap<>();
+    private String qlString;
+
+    public ReactiveQueryImpl(String qlString) {
+      this.qlString = qlString;
+    }
+
+    @Override
+    public ReactiveQuery setParameter(String name, Object value) {
+      params.put(name, value);
+      return this;
+    }
+
+    @Override
+    public Mono<Object> getSingleResult() {
+      return wrapper.fromCallable(() -> {
+        EntityManager em = createEntityManager();
+        em.getTransaction().begin();
+        try {
+          Query query = em.createQuery(qlString);
+          if (!params.isEmpty()) params.forEach(query::setParameter);
+          Object result = query.getSingleResult();
+          em.getTransaction().commit();
+          return result;
+        } catch (Exception e) {
+          em.getTransaction().rollback();
+          throw e;
+        }
+      });
+    }
+  }
+
+  private class ReactiveTypedQueryImpl<T> implements ReactiveTypedQuery<T> {
+    private final Map<String, Object> params = new HashMap<>();
+    private String qlString;
+    private Class<T> resultClass;
+
+    public ReactiveTypedQueryImpl(String qlString, Class<T> resultClass) {
+      this.qlString = qlString;
+      this.resultClass = resultClass;
+    }
+
+    @Override
+    public ReactiveTypedQuery<T> setParameter(String name, Object value) {
+      params.put(name, value);
+      return this;
+    }
+
+    @Override
+    public Mono<T> getSingleResult() {
+      return wrapper.fromCallable(() -> {
+        EntityManager em = createEntityManager();
+        em.getTransaction().begin();
+        try {
+          TypedQuery<T> query = em.createQuery(qlString, resultClass);
+          if (!params.isEmpty()) params.forEach(query::setParameter);
+          T result = query.getSingleResult();
+          em.getTransaction().commit();
+          return result;
+        } catch (Exception e) {
+          em.getTransaction().rollback();
+          throw e;
+        }
       });
     }
   }
