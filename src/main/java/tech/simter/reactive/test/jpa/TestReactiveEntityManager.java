@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * A test encapsulation of {@link EntityManager} for reactive world.
@@ -122,6 +123,8 @@ public class TestReactiveEntityManager implements ReactiveEntityManager {
     private final Map<String, Object> params = new HashMap<>();
     private String qlString;
     private Class<T> resultClass;
+    private int startPosition;
+    private int maxResult;
 
     public ReactiveTypedQueryImpl(String qlString, Class<T> resultClass) {
       this.qlString = qlString;
@@ -135,21 +138,49 @@ public class TestReactiveEntityManager implements ReactiveEntityManager {
     }
 
     @Override
+    public ReactiveTypedQuery<T> setFirstResult(int startPosition) {
+      this.startPosition = startPosition;
+      return this;
+    }
+
+    @Override
+    public ReactiveTypedQuery<T> setMaxResults(int maxResult) {
+      this.maxResult = maxResult;
+      return this;
+    }
+
+    @Override
     public Mono<T> getSingleResult() {
-      return wrapper.fromCallable(() -> {
-        EntityManager em = createEntityManager();
-        em.getTransaction().begin();
-        try {
-          TypedQuery<T> query = em.createQuery(qlString, resultClass);
-          if (!params.isEmpty()) params.forEach(query::setParameter);
-          T result = query.getSingleResult();
-          em.getTransaction().commit();
-          return result;
-        } catch (Exception e) {
-          em.getTransaction().rollback();
-          throw e;
-        }
-      });
+      return wrapper.fromCallable(() -> doInTransaction(TypedQuery::getSingleResult));
+    }
+
+    @Override
+    public Flux<T> getResultList() {
+      return wrapper.fromIterable(() -> doInTransaction(TypedQuery::getResultList));
+    }
+
+    @Override
+    public Flux<T> getResultStream() {
+      return wrapper.fromStream(() -> doInTransaction(TypedQuery::getResultStream));
+    }
+
+    private <R> R doInTransaction(Function<TypedQuery<T>, R> fn) {
+      EntityManager em = createEntityManager();
+      em.getTransaction().begin();
+      try {
+        TypedQuery<T> query = em.createQuery(qlString, resultClass);
+        if (!params.isEmpty()) params.forEach(query::setParameter);
+        if (startPosition > 0) query.setFirstResult(startPosition);
+        if (maxResult > 0) query.setMaxResults(maxResult);
+
+        R result = fn.apply(query);
+
+        em.getTransaction().commit();
+        return result;
+      } catch (Exception e) {
+        em.getTransaction().rollback();
+        throw e;
+      }
     }
   }
 }
