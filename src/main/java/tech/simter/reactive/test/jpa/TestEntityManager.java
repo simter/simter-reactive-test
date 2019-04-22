@@ -69,7 +69,7 @@ public class TestEntityManager {
   public <E> Optional<E> querySingle(Function<EntityManager, TypedQuery<E>> fn) {
     return doInTransaction(em -> {
       try {
-        return Optional.of(fn.apply(em).getSingleResult());
+        return Optional.ofNullable(fn.apply(em).getSingleResult());
       } catch (NoResultException e) {
         return Optional.empty();
       }
