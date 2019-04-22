@@ -21,7 +21,7 @@ import java.util.function.Function;
  *
  * @author RJ
  */
-@Component
+@Component("tech.simter.reactive.test.jpa.TestEntityManager")
 public class TestEntityManager {
   private final EntityManagerFactory emf;
 
