@@ -55,8 +55,14 @@ public class TestEntityManager {
   }
 
   public <E> Optional<E> find(Class<E> entityClass, Object primaryKey) {
+    return find(entityClass, primaryKey, null);
+  }
+
+  public <E> Optional<E> find(Class<E> entityClass, Object primaryKey, Consumer<E> consumer) {
     return doInTransaction(em -> {
-      return Optional.ofNullable(em.find(entityClass, primaryKey));
+      E entity = em.find(entityClass, primaryKey);
+      if (entity != null && consumer != null) consumer.accept(entity);
+      return Optional.ofNullable(entity);
     });
   }
 
