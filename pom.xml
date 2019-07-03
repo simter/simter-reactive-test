@@ -9,7 +9,7 @@
   </parent>
   <groupId>tech.simter.reactive</groupId>
   <artifactId>simter-reactive-test</artifactId>
-  <version>${revision}</version>
+  <version>0.1.0</version>
   <packaging>jar</packaging>
   <name>simter-reactive-test</name>
   <description>Simter reactive test encapsulation</description>
