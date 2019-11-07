@@ -1,5 +1,9 @@
 # simter-reactive-test changelog
 
+## 0.2.0 - 2019-11-07
+
+- Support native query single and list
+
 ## 0.1.0 - 2019-07-03
 
 - Change parent to simter-dependencies-1.2.0
