@@ -82,6 +82,24 @@ public class TestEntityManager {
     });
   }
 
+  @SuppressWarnings("unchecked")
+  public <E> List<E> nativeQueryList(Function<EntityManager, Query> fn) {
+    return doInTransaction(em -> {
+      return (List<E>) fn.apply(em).getResultList();
+    });
+  }
+
+  @SuppressWarnings("unchecked")
+  public <E> Optional<E> nativeQuerySingle(Function<EntityManager, Query> fn) {
+    return doInTransaction(em -> {
+      try {
+        return Optional.ofNullable((E) fn.apply(em).getSingleResult());
+      } catch (NoResultException e) {
+        return Optional.empty();
+      }
+    });
+  }
+
   public int executeUpdate(Function<EntityManager, Query> fn) {
     return doInTransaction(em -> {
       return fn.apply(em).executeUpdate();

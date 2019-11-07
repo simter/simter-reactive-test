@@ -159,6 +159,21 @@ class TestEntityManagerTest @Autowired constructor(
   }
 
   @Test
+  fun `native query list`() {
+    // prepare data
+    val books = List(2) { Book(id = randomString(), title = "test") }
+    createBooks(*books.toTypedArray())
+
+    // query and verify
+    val list: List<Book> = tem.nativeQueryList<Book> { em ->
+      em.createNativeQuery("select b.id, b.title from book b where b.id in :ids", Book::class.java)
+        .setParameter("ids", books.map { it.id })
+    }
+    assertEquals(2, list.size)
+    list.forEach { assertTrue(books.contains(it)) }
+  }
+
+  @Test
   fun `query single`() {
     // prepare data
     val books = List(2) { Book(id = randomString(), title = "test") }
@@ -167,6 +182,20 @@ class TestEntityManagerTest @Autowired constructor(
     // query and verify
     val actual = tem.querySingle { em ->
       em.createQuery("select b from Book b where b.id = :id", Book::class.java)
+        .setParameter("id", books[0].id!!)
+    }
+    assertEquals(Optional.of(books[0]), actual)
+  }
+
+  @Test
+  fun `native query single`() {
+    // prepare data
+    val books = List(2) { Book(id = randomString(), title = "test") }
+    createBooks(*books.toTypedArray())
+
+    // query and verify
+    val actual = tem.nativeQuerySingle<Book> { em ->
+      em.createNativeQuery("select b.id, b.title from book b where b.id = :id", Book::class.java)
         .setParameter("id", books[0].id!!)
     }
     assertEquals(Optional.of(books[0]), actual)
