@@ -1,5 +1,9 @@
 # simter-reactive-test changelog
 
+## 0.4.0 - 2020-04-15
+
+- Upgrade to simter-dependencies-1.3.0-M14
+
 ## 0.3.0 - 2020-03-01
 
 - Upgrade to simter-dependencies-1.3.0-M13
