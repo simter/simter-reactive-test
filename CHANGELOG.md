@@ -1,5 +1,9 @@
 # simter-reactive-test changelog
 
+## 0.6.0 - 2020-11-19
+
+- Upgrade to simter-dependencies-2.0.0
+
 ## 0.5.0 - 2020-06-02
 
 - Upgrade to simter-dependencies-2.0.0-M1
